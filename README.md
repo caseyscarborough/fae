@@ -141,6 +141,8 @@ This can help you figure out where your diagram is going wrong.
 
 An example data file and direct API usage can be seen in the [examples directory](https://github.com/caseyscarborough/fae/tree/master/examples).
 
+The examples in the data file are taken from the Chapter 2 exercises in [Introduction to Languages and the Theory of Computation](http://www.amazon.com/Introduction-Languages-Theory-Computation-Martin/dp/0073191469).
+
 ## Contributing
 
 1. Fork it ( https://github.com/caseyscarborough/fae/fork )
