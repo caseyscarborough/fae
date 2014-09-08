@@ -85,9 +85,6 @@ You can start interactive mode by executing:
 
 ```bash
 fae -i
-
-# Or just
-fae
 ```
 
 Here is an example output:
