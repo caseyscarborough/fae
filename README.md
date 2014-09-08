@@ -4,6 +4,10 @@
 
 This is a small Ruby gem that evaluates a Finite Automata State Diagram for validity.
 
+## Dependencies
+
+* Ruby 1.9.3 or greater
+
 ## Installation
 
 Install the gem by running the following command:
