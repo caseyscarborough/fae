@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["caseyscarborough@gmail.com"]
   spec.summary       = %q{Evaluates Finite Automata State Diagrams for correctness.}
   spec.description   = %q{}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/caseyscarborough/fae"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
