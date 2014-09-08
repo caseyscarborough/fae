@@ -1,0 +1,60 @@
+- description: the language of all strings in which the number of a's is even
+  language: a, b
+  states:
+    A: a -> B, b -> A, accepting
+    B: a -> A, b -> B
+  strings:
+    a: invalid
+    aa: valid
+    aaa: invalid
+    baba: valid
+    bababa: invalid
+    bab: invalid
+    # As many other string combinations you'd like to test
+- description: 2.1f - the language of all strings with an even number of a's
+  language: a, b
+  states:
+    A: a -> B, b -> A, accepting
+    B: a -> A, b -> B
+  strings:
+    a: invalid
+    aa: valid
+    aaa: invalid
+    aaabbbbbbbba: valid
+- description: 2.1h - the language of all strings containing no more than one occurrence of the string "aa"
+  language: a, b
+  states:
+    A: a -> B, b -> A, accepting
+    B: a -> C, b -> A, accepting
+    C: a -> E, b -> D, accepting
+    D: a -> F, b -> D, accepting
+    E: a -> E, b -> E
+    F: a -> E, b -> D, accepting
+  strings:
+    a: valid
+    aa: valid
+    aaa: invalid
+    aaabbbbbbbba: invalid
+    aabbabbba: valid
+- description: 2.1d - the language of all strings that begin or end with "aa" or "bb"
+  language: a, b
+  states:
+    A: a -> B, b -> D
+    B: a -> C, b -> G
+    C: a -> C, b -> C, accepting
+    D: a -> F, b -> E
+    E: a -> E, b -> E, accepting
+    F: a -> H, b -> G
+    G: a -> F, b -> I
+    H: b -> G, a -> H, accepting
+    I: a -> F, b -> I, accepting
+  strings:
+    a: invalid
+    aa: valid
+    aaa: valid
+    aaabbbbbba: valid
+    aabbabba: valid
+    bbabba: valid
+    babbbab: invalid
+    babbbabb: valid
+    abbabbba: invalid
