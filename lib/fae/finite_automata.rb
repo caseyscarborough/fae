@@ -34,7 +34,7 @@ module Fae
       return retrieved_state
     end
 
-    def evaluate
+    def evaluate!
       @invalids = []
       if (@states.length == 0)
         raise "You must add some states to your Finite Automata before checking strings"
