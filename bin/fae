@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+require 'yaml'
+require_relative '../lib/fae'
+
+filename = ARGV[0]
+diagrams = YAML.load_file(filename)
+
+diagrams.each do |diagram|
+  language = diagram["language"].split(',')
+  language.map(&:strip!)
+  lang = Fae::Language.new(language)
+  fa = Fae::FiniteAutomata.new(lang, diagram["description"])
+
+  states = []
+  diagram["states"].keys.each do |state|
+    name = state
+    values = diagram["states"][name].split(",")
+    values.map(&:strip!)
+
+    paths = {}
+    values.each do |value|
+      match = value.split("->")
+      match.map(&:strip!)
+      if (match)
+        paths[match[0].to_sym] = match[1]
+      end
+    end
+    states << Fae::State.new(name, paths, values[-1] == "accepting")        
+  end
+
+  strings = []
+  diagram["strings"].keys.each do |string|
+    value = string
+    valid = diagram["strings"][string] == "valid"
+    strings << String.new(value.dup, valid)
+  end
+
+  fa.add_states(states)
+  fa.add_strings(strings)
+  fa.evaluate
+end
