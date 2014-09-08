@@ -1,5 +1,7 @@
 # Fae
 
+[![Gem Version](https://badge.fury.io/rb/fae.svg)](http://badge.fury.io/rb/fae)
+
 This is a small Ruby gem that evaluates a Finite Automata State Diagram for validity.
 
 ## Installation
