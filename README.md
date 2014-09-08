@@ -100,18 +100,18 @@ You can also use the library directly if you'd rather run your own scripts. Here
 require 'fae'
 
 characters = ['a', 'b']
-language = Language.new(characters)
+language = Fae::Language.new(characters)
 
 # A Finite Automata is created with a language and description.
-fa = FiniteAutomata.new(language, "The language of all strings containing at least two a's")
+fa = Fae::FiniteAutomata.new(language, "The language of all strings containing at least two a's")
 
 fa.add_states([
   # A new state is created with a name, a Hash of paths,
   # and whether or not it is accepting. The hash of paths
   # takes the letter as a key, and the next state as its value.
-  State.new('A', { :a => 'B', :b => 'A' }, false),
-  State.new('B', { :a => 'C', :b => 'B' }, false),
-  State.new('C', { :a => 'C', :b => 'C' }, true)
+  Fae::State.new('A', { :a => 'B', :b => 'A' }, false),
+  Fae::State.new('B', { :a => 'C', :b => 'B' }, false),
+  Fae::State.new('C', { :a => 'C', :b => 'C' }, true)
 ])
 
 fa.add_strings([
