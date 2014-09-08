@@ -1,41 +1,69 @@
 #!/usr/bin/env ruby
+require 'optparse'
 require 'yaml'
 require_relative '../lib/fae'
 
-filename = ARGV[0]
-diagrams = YAML.load_file(filename)
+options = {}
+OptionParser.new do |opt|
+  opt.banner = "Usage: fae [options]"
 
-diagrams.each do |diagram|
-  language = diagram["language"].split(',')
-  language.map(&:strip!)
-  lang = Fae::Language.new(language)
-  fa = Fae::FiniteAutomata.new(lang, diagram["description"])
+  opt.on('-h', '--help', 'View this help menu') { puts opt; exit 0 }
+  opt.on('-f FILENAME', '--file FILENAME', 'Evaluate a data file') { |o| options[:file] = o }
+  opt.on('-v', '--version', 'Display the version number') { puts Fae::VERSION; exit 0 }
 
-  states = []
-  diagram["states"].keys.each do |state|
-    name = state
-    values = diagram["states"][name].split(",")
-    values.map(&:strip!)
+  begin
+    opt.parse!
+  rescue OptionParser::InvalidOption => e
+    puts e.message
+    puts opt
+    exit 1
+  rescue OptionParser::MissingArgument => e
+    puts e.message
+    puts opt
+    exit 1
+  end
+end
 
-    paths = {}
-    values.each do |value|
-      match = value.split("->")
-      match.map(&:strip!)
-      if (match)
-        paths[match[0].to_sym] = match[1]
+if (options[:file])
+  diagrams = nil
+  begin
+    diagrams = YAML.load_file(options[:file])
+  rescue Exception => e
+    abort "No such file: #{options[:file]}"
+  end
+
+  diagrams.each do |diagram|
+    language = diagram["language"].split(',')
+    language.map(&:strip!)
+    lang = Fae::Language.new(language)
+    fa = Fae::FiniteAutomata.new(lang, diagram["description"])
+
+    states = []
+    diagram["states"].keys.each do |state|
+      name = state
+      values = diagram["states"][name].split(",")
+      values.map(&:strip!)
+
+      paths = {}
+      values.each do |value|
+        match = value.split("->")
+        match.map(&:strip!)
+        if (match)
+          paths[match[0].to_sym] = match[1]
+        end
       end
+      states << Fae::State.new(name, paths, values[-1] == "accepting")        
     end
-    states << Fae::State.new(name, paths, values[-1] == "accepting")        
-  end
 
-  strings = []
-  diagram["strings"].keys.each do |string|
-    value = string
-    valid = diagram["strings"][string] == "valid"
-    strings << String.new(value.dup, valid)
-  end
+    strings = []
+    diagram["strings"].keys.each do |string|
+      value = string
+      valid = diagram["strings"][string] == "valid"
+      strings << String.new(value.dup, valid)
+    end
 
-  fa.add_states(states)
-  fa.add_strings(strings)
-  fa.evaluate
+    fa.add_states(states)
+    fa.add_strings(strings)
+    fa.evaluate
+  end
 end
