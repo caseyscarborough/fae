@@ -1,5 +1,15 @@
 module Fae
+
+  # The main class that drives the Finite Automata evaluation.
+  #
+  # Takes in a language, states, and strings, and checks them
+  # to validate a state diagram.
   class FiniteAutomata
+    
+    # Initializes a new instance of the FiniteAutomata.
+    #
+    # @param language [Language] a language instance
+    # @param description [String] the description of the finite automata  
     def initialize(language, description)
       @states = []
       @strings = []
@@ -8,18 +18,27 @@ module Fae
       @description = description
     end
 
+    # Adds strings to check against when evaluating.
+    #
+    # @param strings [Array] an array of strings
     def add_strings(strings)
       strings.each do |string|
         @strings << string
       end
     end
 
+    # Adds strings to check against when evaluating.
+    #
+    # @param states [Array] an array of states
     def add_states(states)
       states.each do |state|
         add_state(state)
       end
     end
 
+    # Retrieves a state from this finite automata by name.
+    #
+    # @param name [String] the name of the state to find
     def get_state(name)
       retrieved_state = nil
       @states.each do |state|
@@ -34,6 +53,7 @@ module Fae
       return retrieved_state
     end
 
+    # Runs the evaluation on the finite automata.
     def evaluate!
       @invalids = []
       if (@states.length == 0)

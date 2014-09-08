@@ -10,8 +10,7 @@ require_relative 'fae/version'
 module Fae
 
   class << self
-
-    def load_file(filename)
+    def file_mode(filename)
       diagrams = nil
       begin
         diagrams = YAML.load_file(filename)
@@ -55,7 +54,7 @@ module Fae
       end
     end
 
-    def interactive
+    def interactive_mode
       states  = []
       strings = []
 

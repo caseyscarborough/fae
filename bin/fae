@@ -26,7 +26,7 @@ OptionParser.new do |opt|
 end
 
 if (options[:file])
-  Fae.load_file(options[:file])
+  Fae.file_mode(options[:file])
 else
-  Fae.interactive
+  Fae.interactive_mode
 end
