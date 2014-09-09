@@ -2,7 +2,7 @@ module Fae
 
   # A state in the state diagram.
   class State
-    attr_accessor :name, :next_states, :accepting
+    attr_accessor :name, :paths, :accepting
 
     # Creates a new state instance.
     #
@@ -11,9 +11,9 @@ module Fae
     # @param valid [Boolean] whether or not this is an accepting state
     # @example
     #   State.new('A', { :a => 'B', :b => 'A' }, true)
-    def initialize(name, next_states, accepting)
+    def initialize(name, paths, accepting)
       @name = name
-      @next_states = next_states
+      @paths = paths
       @accepting = accepting
     end
 
@@ -29,7 +29,7 @@ module Fae
       end
       print "#{@name} #{'->'.colorize(:light_black)} "
       
-      next_state  = fa.get_state(next_states[string.first.to_sym])
+      next_state  = fa.get_state(paths[string.first.to_sym])
       next_string = string.shift_left
       next_state.evaluate(next_string, fa)
     end

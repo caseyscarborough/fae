@@ -5,6 +5,7 @@ module Fae
   # Takes in a language, states, and strings, and checks them
   # to validate a state diagram.
   class FiniteAutomata
+    attr_reader :language, :description, :states, :strings
     
     # Initializes a new instance of the FiniteAutomata.
     #
@@ -60,6 +61,40 @@ module Fae
       return retrieved_state
     end
 
+    # Generates the finite automata for the intersection
+    # of two different finite automatas.
+    #
+    # @param fa [FiniteAutomata] the finite automata to intersect this one with
+    def intersection(fa)
+      if (@language.characters.uniq.sort != fa.language.characters.uniq.sort)
+        puts "Intersection currently requires the languages to be the same.".colorize(:red)
+        return 
+      end
+      i_states  = []
+      i_strings = []
+      i_description = "the intersection of #{@description} and #{fa.description}"
+      i_fa = FiniteAutomata.new(@language, i_description)
+
+      @states.each do |state|
+        fa.states.each do |fa_state|
+          name = state.name + fa_state.name
+          accepting = false
+          paths = {}
+          state.paths.keys.each do |key|
+            path = state.paths[key] + fa_state.paths[key]
+            paths[key] = path
+          end
+          if (state.accepting && fa_state.accepting)
+            accepting = true
+          end
+          i_states << State.new(name, paths, accepting)
+        end
+      end
+
+      i_fa.add_states(i_states)
+      return i_fa
+    end
+
     # Runs the evaluation on the finite automata.
     def evaluate!
       @invalids = []
@@ -89,6 +124,22 @@ module Fae
         puts "State diagram is correct.".colorize(:green)
       end
       puts
+    end
+
+    def to_s
+      output = ""
+      output << "Description: ".colorize(:yellow) + @description
+      output << "\nLanguage: ".colorize(:yellow) + language.characters.to_s
+      output << "\nStates:".colorize(:yellow)
+      @states.each do |state|
+        output << "\n  State #{state.name}: ".colorize(:blue)
+        state.paths.keys.each do |key|
+          output << "\n    #{'~'.colorize(:yellow)} #{key} #{'->'.colorize(:light_black)} #{state.paths[key]}"
+        end
+        accepting = state.accepting ? "accepting".colorize(:green) : "not accepting".colorize(:red)
+        output << "\n    #{'~'.colorize(:yellow)} #{accepting}"
+      end
+      return output
     end
 
   private
