@@ -105,9 +105,9 @@ DESC
 union = Fae::FiniteAutomata.new(LANGUAGE, description)
 
 # For union, BC, AE, BD, and BE are accepting states
-states[:BC].valid = true
-states[:AE].valid = true
-states[:BD].valid = true
+states[:BC].accepting = true
+states[:AE].accepting = true
+states[:BD].accepting = true
 # state_BE is alread valid
 
 get_random_strings.each { |s| union.add_string(String.new(s, valid_for_union(s))) }
@@ -126,8 +126,8 @@ DESC
 difference = Fae::FiniteAutomata.new(LANGUAGE, description)
 
 # For difference, BC and BD are accepting states
-states[:AE].valid = false
-states[:BE].valid = false
+states[:AE].accepting = false
+states[:BE].accepting = false
 
 get_random_strings.each { |s| difference.add_string(String.new(s, valid_for_difference(s))) }
 difference.add_states(get_array_from_hash(states))

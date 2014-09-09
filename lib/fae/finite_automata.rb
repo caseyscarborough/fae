@@ -106,7 +106,7 @@ module Fae
       print "#{string.colorize(:blue)}: "
       if (@language.string_is_valid(string))
         result = @states.first.evaluate(string, self)
-        if (result[:valid] != string.expected)
+        if (result[:accepting] != string.expected)
           puts "\u2717".encode("utf-8").colorize(:red)
           return false
         else

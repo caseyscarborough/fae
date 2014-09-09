@@ -2,7 +2,7 @@ module Fae
 
   # A state in the state diagram.
   class State
-    attr_accessor :name, :next_states, :valid
+    attr_accessor :name, :next_states, :accepting
 
     # Creates a new state instance.
     #
@@ -11,24 +11,27 @@ module Fae
     # @param valid [Boolean] whether or not this is an accepting state
     # @example
     #   State.new('A', { :a => 'B', :b => 'A' }, true)
-    def initialize(name, next_states, valid)
+    def initialize(name, next_states, accepting)
       @name = name
       @next_states = next_states
-      @valid = valid
+      @accepting = accepting
     end
 
-    # Evaluates a string at this state, and passes it to the next state.
+    # Evaluates a string at this state, and passes the next string to the next state.
     #
     # @param string [String] the string to evaluate
     # @param fa [FiniteAutomata] the finite automata that this state belongs to
     def evaluate(string, fa)
       if (string.first.empty?)
-        output = @valid ? "valid".colorize(:green) : "invalid".colorize(:red)
+        output = @accepting ? "accepting".colorize(:green) : "not accepting".colorize(:red)
         print "#{@name} (#{output}) "
-        return { :output => output, :valid => @valid }
+        return { :output => output, :accepting => @accepting }
       end
       print "#{@name} #{'->'.colorize(:light_black)} "
-      fa.get_state(next_states[string.first.to_sym]).evaluate(string.shift_left, fa)
+      
+      next_state  = fa.get_state(next_states[string.first.to_sym])
+      next_string = string.shift_left
+      next_state.evaluate(next_string, fa)
     end
   end
 end
