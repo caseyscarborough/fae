@@ -3,6 +3,17 @@ require_relative '../lib/fae'
 CHARACTERS = ['a', 'b', 'c', 'd']
 LANGUAGE   = Fae::Language.new(CHARACTERS)
 
+# Patch the string class to make valid lambdas easier to read.
+class String
+  def has_at_least_three_cs?
+    self.length - 3 >= self.gsub('c', '').length
+  end
+
+  def has_abcd_substring?
+    !self.match(/abcd/).nil?
+  end
+end
+
 def print_valid_message(valid)
   message = valid ? "VALID".colorize(:green) : "INVALID".colorize(:red)
   puts message
@@ -10,9 +21,7 @@ end
 
 def run_validation(fa, block)
   fa.valid_block = block
-  fa.generate_strings(100, 20)
-
-  valid = fa.evaluate!(true)
+  valid = fa.generate_strings(100, 20).evaluate!(true)
   print_valid_message(valid)
 end
 
@@ -51,18 +60,18 @@ run_validation(fa_2, lambda { |string| string.length - 3 >= string.gsub('c', '')
 
 # Intersection
 intersection = fa_1.intersection(fa_2)
-run_validation(intersection, lambda do |string|
-  (string.length - 3 >= string.gsub('c', '').length) && !string.match(/abcd/).nil?
-end)
+run_validation(
+  intersection, lambda { |s| s.has_abcd_substring? && s.has_at_least_three_cs? }
+)
 
 # Union
 union = fa_1.union(fa_2)
-run_validation(union, lambda do |string|
-  (string.length - 3 >= string.gsub('c', '').length) || !string.match(/abcd/).nil?
-end)
+run_validation(
+  union, lambda { |s| s.has_abcd_substring? || s.has_at_least_three_cs? }
+)
 
 # Difference
 difference = fa_1.difference(fa_2)
-run_validation(difference, lambda do |string|
-  !string.match(/abcd/).nil? && !(string.length - 3 >= string.gsub('c', '').length)
-end)
+run_validation(
+  difference, lambda { |s| s.has_abcd_substring? && !s.has_at_least_three_cs? }
+)

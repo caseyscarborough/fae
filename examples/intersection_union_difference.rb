@@ -20,32 +20,6 @@ def string_has_bb_substring?(string)
   !string.match(/bb/).nil?
 end
 
-def valid_for_intersection?(string)
-  string_has_odd_number_of_the_letter_a?(string) && string_has_bb_substring?(string)
-end
-
-def valid_for_union?(string)
-  string_has_odd_number_of_the_letter_a?(string) || string_has_bb_substring?(string)
-end
-
-def valid_for_difference?(string)
-  string_has_odd_number_of_the_letter_a?(string) && !string_has_bb_substring?(string)
-end
-
-# Returns 100 random strings in the language, 50 of length 15 and 50 of length 5.
-def get_random_strings
-  generate_string = lambda do |num|
-    string = ""
-    num.times { string << CHARACTERS.sample }
-    string
-  end
-
-  strings = []
-  50.times { strings << generate_string.call(15) }
-  50.times { strings << generate_string.call(5) }
-  strings
-end
-
 fa_1 = Fae::FiniteAutomata.new(LANGUAGE, "the language of all strings where the number of a's is odd")
 fa_2 = Fae::FiniteAutomata.new(LANGUAGE, "the language of all strings that include the substring 'bb'")
 
@@ -64,15 +38,21 @@ fa_2.add_states([
 
 # Perform the intersection
 intersection = fa_1.intersection(fa_2)
-get_random_strings.each { |s| intersection.add_string(String.new(s, valid_for_intersection?(s))) }
-intersection.evaluate!
+intersection.valid_block = lambda do |string|
+  string_has_odd_number_of_the_letter_a?(string) && string_has_bb_substring?(string)
+end
+intersection.generate_strings(100, 10).evaluate!
 
 # Perform the union
 union = fa_1.union(fa_2)
-get_random_strings.each { |s| union.add_string(String.new(s, valid_for_union?(s))) }
-union.evaluate!
+union.valid_block = lambda do |string|
+  string_has_odd_number_of_the_letter_a?(string) || string_has_bb_substring?(string)
+end
+union.generate_strings(100, 10).evaluate!
 
 # Perform the difference
 difference = fa_1.difference(fa_2)
-get_random_strings.each { |s| difference.add_string(String.new(s, valid_for_difference?(s))) }
-union.evaluate!
+difference.valid_block = lambda do |string|
+  string_has_odd_number_of_the_letter_a?(string) && !string_has_bb_substring?(string)
+end
+difference.generate_strings(100, 10).evaluate!
