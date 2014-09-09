@@ -18,7 +18,7 @@ Install the gem by running the following command:
 gem install fae
 ```
 
-## Evaluation Usage
+## Evaluation a Diagram
 
 The gem comes with an executable, `fae`, and can be run in two different modes, interactive or file.
 
@@ -99,7 +99,9 @@ Here is an example output:
 
 ## Using the API
 
-You can also use the library directly if you'd rather run your own scripts. Here is an example usage:
+You can also use the library directly if you'd rather run your own scripts.
+
+### Basic Usage
 
 ```rb
 require 'fae'
@@ -130,7 +132,39 @@ fa.add_strings([
 
 # Run the evaluation
 fa.evaluate!
+
+# Run the evaluation with no output
+valid = fa.evaluate!(true)
+puts "Diagram is correct" if valid
 ```
+
+### Generating Tests for your State Diagram
+
+If you really want to test your diagram and don't want to have to come up with all of your valid or invalid strings, you can generate valid and invalid strings by setting the `valid_block` as a lambda returning a boolean expression on your Finite Automata that represents a valid string in the language.
+
+For example, in the language of all strings that have an odd number of a's, the following code would represent a valid string:
+
+```ruby
+# If the value is one when we take away all b's and mod the 
+# length by two, then we had an odd number of a's
+string.gsub('b', '').length % 2 == 1
+```
+
+Here is a full example that would test 1000 strings against your diagram:
+
+```ruby
+language = Fae::Language.new(['a', 'b'])
+fa = Fae::FiniteAutomata.new(language, "strings that have an odd number of a's")
+
+# Set the valid block
+fa.valid_block = lambda { |string| string.gsub('b', '').length % 2 == 1 }
+
+# Generate 1000 strings of length 20 and evaluate:
+fa.generate_strings(1000, 20)
+fa.evaluate!
+```
+
+For more examples, see [`examples/advanced.rb`](https://github.com/caseyscarborough/fae/blob/master/examples/advanced.rb)
 
 ## When Your State Diagram is Incorrect
 
@@ -140,7 +174,7 @@ If your state diagram is incorrect, the program will give you feedback about you
 
 This can help you figure out where your diagram is going wrong.
 
-## Generation Usage
+## Generating a Diagram
 
 You can use the gem to generate the union, intersection, or difference of two state diagrams. See the following:
 
@@ -175,7 +209,7 @@ puts intersection
 
 ![Example Intersection Output](https://raw.githubusercontent.com/caseyscarborough/fae/master/etc/example_intersection_output.png)
 
-See [`intersection_union_difference.rb`](https://github.com/caseyscarborough/fae/blob/master/examples/intersection_union_difference.rb) for an example of generating the diagram and evaluating them.
+See [`examples/intersection_union_difference.rb`](https://github.com/caseyscarborough/fae/blob/master/examples/intersection_union_difference.rb) for an example of generating the diagram and evaluating them.
 
 ## Examples
 
