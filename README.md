@@ -153,6 +153,8 @@ string.gsub('b', '').length % 2 == 1
 Here is a full example that would test 1000 strings against your diagram:
 
 ```ruby
+require 'fae'
+
 language = Fae::Language.new(['a', 'b'])
 fa = Fae::FiniteAutomata.new(language, "strings that have an odd number of a's")
 
@@ -179,6 +181,8 @@ This can help you figure out where your diagram is going wrong.
 You can use the gem to generate the union, intersection, or difference of two state diagrams. See the following:
 
 ```ruby
+require 'fae'
+
 fa_1 = Fae::FiniteAutomata.new(LANGUAGE, "the language of all strings where the number of a's is odd")
 fa_2 = Fae::FiniteAutomata.new(LANGUAGE, "the language of all strings that include the substring 'bb'")
 
