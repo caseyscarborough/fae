@@ -25,6 +25,7 @@ module Fae
     # @param strings [Array] an array of strings
     def add_strings(strings)
       strings.each { |string| @strings << string }
+      self
     end
 
     # Adds a single string to the strings array.
@@ -39,6 +40,7 @@ module Fae
     # @param states [Array] an array of states
     def add_states(states)
       states.each { |state| add_state(state) }
+      self
     end
 
     # Adds a single state to the states array.
@@ -142,7 +144,7 @@ module Fae
         strings << String.new(string, valid_block.call(string))
       end
       self.add_strings(strings)
-      strings
+      self
     end
 
     def to_s
