@@ -40,7 +40,7 @@ module Fae
       valid = true
       @states.each do |state|
         if (new_state.name == state.name)
-          raise 'Duplicate state added for Finite Automata'
+          raise Fae::DuplicateStateException, 'Duplicate state added for Finite Automata'
         end
       end
       @states << new_state
@@ -67,7 +67,7 @@ module Fae
         end
       end
       if (retrieved_state.nil?)
-        raise "State #{name} was not found in this Finite Automata. Ensure that all states have outputs for #{@language.characters}"
+        raise Fae::StateNotFoundException, "State #{name} was not found in this Finite Automata. Ensure that all states have outputs for #{@language.characters}"
       end
       return retrieved_state
     end
@@ -101,7 +101,7 @@ module Fae
       output = ""
       @invalids = []
       if (@states.length == 0)
-        raise "You must add some states to your Finite Automata before checking strings"
+        raise Fae::EmptyStatesException, 'You must add some states to your Finite Automata before checking strings'
       end
 
       output << "Evaluating strings for #{@description} using language #{@language.characters}".colorize(:yellow)
@@ -136,7 +136,7 @@ module Fae
 
     def generate_strings(number, length)
       if valid_block.nil?
-        raise 'You must set the valid block for the Finite Automata to generate strings'
+        raise Fae::MissingValidBlockException, 'You must set the valid block for the Finite Automata to generate strings'
       end
 
       strings = []

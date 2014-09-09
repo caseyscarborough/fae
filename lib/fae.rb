@@ -2,6 +2,7 @@ require 'colorize'
 
 # Fae classes
 require_relative 'string'
+require_relative 'fae/exceptions'
 require_relative 'fae/language'
 require_relative 'fae/state'
 require_relative 'fae/finite_automata'
