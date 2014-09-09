@@ -18,7 +18,7 @@ Install the gem by running the following command:
 gem install fae
 ```
 
-## Evaluation a Diagram
+## Evaluating a Diagram
 
 The gem comes with an executable, `fae`, and can be run in two different modes, interactive or file.
 
