@@ -66,33 +66,23 @@ module Fae
     #
     # @param fa [FiniteAutomata] the finite automata to intersect this one with
     def intersection(fa)
-      if (@language.characters.uniq.sort != fa.language.characters.uniq.sort)
-        puts "Intersection currently requires the languages to be the same.".colorize(:red)
-        return 
-      end
-      i_states  = []
-      i_strings = []
-      i_description = "the intersection of #{@description} and #{fa.description}"
-      i_fa = FiniteAutomata.new(@language, i_description)
+      perform_set_operation(:intersection, fa)
+    end
 
-      @states.each do |state|
-        fa.states.each do |fa_state|
-          name = state.name + fa_state.name
-          accepting = false
-          paths = {}
-          state.paths.keys.each do |key|
-            path = state.paths[key] + fa_state.paths[key]
-            paths[key] = path
-          end
-          if (state.accepting && fa_state.accepting)
-            accepting = true
-          end
-          i_states << State.new(name, paths, accepting)
-        end
-      end
+    # Generates the finite automata for the union
+    # of two different finite automatas.
+    #
+    # @param fa [FiniteAutomata] the finite automata to union this one with
+    def union(fa)
+      perform_set_operation(:union, fa)
+    end
 
-      i_fa.add_states(i_states)
-      return i_fa
+    # Generates the finite automata for the difference
+    # of two different finite automatas.
+    #
+    # @param fa [FiniteAutomata] the finite automata to difference this one with
+    def difference(fa)
+      perform_set_operation(:difference, fa)
     end
 
     # Runs the evaluation on the finite automata.
@@ -143,6 +133,38 @@ module Fae
     end
 
   private
+    def perform_set_operation(type, fa)
+      if (@language.characters.uniq.sort != fa.language.characters.uniq.sort)
+        puts "Performing the #{type.to_s} requires the languages to be the same.".colorize(:red)
+        return 
+      end
+      i_states  = []
+      i_strings = []
+      i_description = "the #{type.to_s} of #{@description} and #{fa.description}"
+      i_fa = FiniteAutomata.new(@language, i_description)
+
+      @states.each do |state|
+        fa.states.each do |fa_state|
+          name = state.name + fa_state.name
+          accepting = false
+          paths = {}
+          state.paths.keys.each do |key|
+            path = state.paths[key] + fa_state.paths[key]
+            paths[key] = path
+          end
+          if ((type == :intersection && (state.accepting && fa_state.accepting)) || 
+              (type == :difference && (state.accepting && !fa_state.accepting )) ||
+              (type == :union && (state.accepting || fa_state.accepting)))
+            accepting = true
+          end
+          i_states << State.new(name, paths, accepting)
+        end
+      end
+
+      i_fa.add_states(i_states)
+      return i_fa
+    end
+
     def add_state(new_state)
       valid = true
       @states.each do |state|

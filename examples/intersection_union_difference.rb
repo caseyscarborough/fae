@@ -14,121 +14,67 @@ LANGUAGE = Fae::Language.new(CHARACTERS)
 
 states = {}
 
-# Checks if the given string has an odd number of a's
-def string_has_odd_number_of_the_letter_a(string)
-  return (string.gsub('b', '').length % 2 == 1)
+def string_has_odd_number_of_the_letter_a?(string)
+  string.gsub('b', '').length % 2 == 1
 end
 
-# Checks if the given string has the bb substring
-def string_has_bb_substring(string)
-  match = string.match(/bb/)
-  if (match)
-    return true
-  end
-  return false
+def string_has_bb_substring?(string)
+  !string.match(/bb/).nil?
 end
 
-# Checks if the string is valid for the intersection of the two languages
-def valid_for_intersection(string)
-  return string_has_odd_number_of_the_letter_a(string) && string_has_bb_substring(string)
+def valid_for_intersection?(string)
+  string_has_odd_number_of_the_letter_a?(string) && string_has_bb_substring?(string)
 end
 
-# Checks if the string is valid for the union of the two languages
-def valid_for_union(string)
-  return string_has_odd_number_of_the_letter_a(string) || string_has_bb_substring(string)
+def valid_for_union?(string)
+  string_has_odd_number_of_the_letter_a?(string) || string_has_bb_substring?(string)
 end
 
-# Checks if the string is valid for the difference of the two languages
-def valid_for_difference(string)
-  return string_has_odd_number_of_the_letter_a(string) && !string_has_bb_substring(string)
+def valid_for_difference?(string)
+  string_has_odd_number_of_the_letter_a?(string) && !string_has_bb_substring?(string)
 end
 
 # Returns 100 random strings in the language, 50 of length 15 and 50 of length 5.
 def get_random_strings
+  generate_string = lambda do |num|
+    string = ""
+    num.times { string << CHARACTERS.sample }
+    string
+  end
+
   strings = []
-
-  50.times do
-    string = ""
-    15.times { string << CHARACTERS.sample }
-    strings << string
-  end
-
-  50.times do
-    string = ""
-    5.times { string << CHARACTERS.sample }
-    strings << string
-  end
-  return strings
+  50.times { strings << generate_string.call(15) }
+  50.times { strings << generate_string.call(5) }
+  strings
 end
 
-# Turns a hash into an array (drops keys)
-def get_array_from_hash(states)
-  states_array = []
-  states.keys.each do |key|
-    states_array << states[key]
-  end
-  return states_array
-end
+fa_1 = Fae::FiniteAutomata.new(LANGUAGE, "the language of all strings where the number of a's is odd")
+fa_2 = Fae::FiniteAutomata.new(LANGUAGE, "the language of all strings that include the substring 'bb'")
 
-###################
-# Intersection
+# These states were determined by drawing the state diagram.
+fa_1.add_states([
+  Fae::State.new('A', { :a => 'B', :b => 'A' }, false),
+  Fae::State.new('B', { :a => 'A', :b => 'B' }, true),
+])
 
-description = <<-DESC
-The intersection of the language all strings that
-have an odd number of a's and the language of all
-strings that includes the substring 'bb'
-DESC
+# These states were determined by drawing the state diagram.
+fa_2.add_states([
+  Fae::State.new('C', { :a => 'C', :b => 'D' }, false),
+  Fae::State.new('D', { :a => 'C', :b => 'E' }, false),
+  Fae::State.new('E', { :a => 'E', :b => 'E' }, true),
+])
 
-intersection = Fae::FiniteAutomata.new(LANGUAGE, description)
-
-# For intersection, BE is the only accepting state.
-states[:AC] = Fae::State.new('AC', {:a => 'BC', :b => 'AD'}, false)
-states[:AD] = Fae::State.new('AD', {:a => 'BC', :b => 'AE'}, false)
-states[:AE] = Fae::State.new('AE', {:a => 'BE', :b => 'AE'}, false)
-states[:BC] = Fae::State.new('BC', {:a => 'AC', :b => 'BD'}, false)
-states[:BD] = Fae::State.new('BD', {:a => 'AC', :b => 'BE'}, false)
-states[:BE] = Fae::State.new('BE', {:a => 'AE', :b => 'BE'}, true)
-
-get_random_strings.each { |s| intersection.add_string(String.new(s, valid_for_intersection(s))) }
-intersection.add_states(get_array_from_hash(states))
+# Perform the intersection
+intersection = fa_1.intersection(fa_2)
+get_random_strings.each { |s| intersection.add_string(String.new(s, valid_for_intersection?(s))) }
 intersection.evaluate!
 
-###################
-# Union
-
-description = <<-DESC
-The union of the language all strings that
-have an odd number of a's and the language of all
-strings that includes the substring 'bb'
-DESC
-
-union = Fae::FiniteAutomata.new(LANGUAGE, description)
-
-# For union, BC, AE, BD, and BE are accepting states
-states[:BC].accepting = true
-states[:AE].accepting = true
-states[:BD].accepting = true
-# state_BE is alread valid
-
-get_random_strings.each { |s| union.add_string(String.new(s, valid_for_union(s))) }
-union.add_states(get_array_from_hash(states))
+# Perform the union
+union = fa_1.union(fa_2)
+get_random_strings.each { |s| union.add_string(String.new(s, valid_for_union?(s))) }
 union.evaluate!
 
-###################
-# Difference
-
-description = <<-DESC
-The difference of the language all strings that
-have an odd number of a's and the language of all
-strings that includes the substring 'bb'
-DESC
-
-difference = Fae::FiniteAutomata.new(LANGUAGE, description)
-
-# For difference, BC and BD are accepting states
-states[:AE].accepting = false
-states[:BE].accepting = false
-
-get_random_strings.each { |s| difference.add_string(String.new(s, valid_for_difference(s))) }
-difference.add_states(get_array_from_hash(states))
-difference.evaluate!
+# Perform the difference
+difference = fa_1.difference(fa_2)
+get_random_strings.each { |s| difference.add_string(String.new(s, valid_for_difference?(s))) }
+union.evaluate!
