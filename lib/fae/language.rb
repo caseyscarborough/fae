@@ -7,7 +7,7 @@ module Fae
     # Creates a new language instance.
     #
     # @param characters [Array] an array of characters
-    def initialize(characters)
+    def initialize(characters, valid_block=nil)
       @characters = []
       @characters = characters.uniq
     end
@@ -19,7 +19,7 @@ module Fae
       # Use lookahead to check for valid string
       regex = "^(?=.*\\D)[#{@characters.join('|')}]+$"
 
-      if (string.match /#{regex}/)
+      if string.match /#{regex}/
         return true
       end
       return false

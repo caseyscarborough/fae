@@ -22,16 +22,18 @@ module Fae
     # @param string [String] the string to evaluate
     # @param fa [FiniteAutomata] the finite automata that this state belongs to
     def evaluate(string, fa)
+      output = ""
       if (string.first.empty?)
-        output = @accepting ? "accepting".colorize(:green) : "not accepting".colorize(:red)
-        print "#{@name} (#{output}) "
+        output << "#{@name} (#{@accepting ? 'accepting'.colorize(:green) : 'not accepting'.colorize(:red)}) "
         return { :output => output, :accepting => @accepting }
       end
-      print "#{@name} #{'->'.colorize(:light_black)} "
+      output << "#{@name} #{'->'.colorize(:light_black)} "
       
       next_state  = fa.get_state(paths[string.first.to_sym])
       next_string = string.shift_left
-      next_state.evaluate(next_string, fa)
+      result = next_state.evaluate(next_string, fa)
+      output << result[:output]
+      return { :output => output, :accepting => result[:accepting] }
     end
   end
 end

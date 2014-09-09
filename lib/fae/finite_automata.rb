@@ -6,6 +6,7 @@ module Fae
   # to validate a state diagram.
   class FiniteAutomata
     attr_reader :language, :description, :states, :strings
+    attr_accessor :valid_block
     
     # Initializes a new instance of the FiniteAutomata.
     #
@@ -33,6 +34,16 @@ module Fae
     # @param string [String] the string to add
     def add_string(string)
       @strings << string
+    end
+
+    def add_state(new_state)
+      valid = true
+      @states.each do |state|
+        if (new_state.name == state.name)
+          raise 'Duplicate state added for Finite Automata'
+        end
+      end
+      @states << new_state
     end
     
     # Adds strings to check against when evaluating.
@@ -86,34 +97,56 @@ module Fae
     end
 
     # Runs the evaluation on the finite automata.
-    def evaluate!
+    def evaluate!(suppress_output=false)
+      output = ""
       @invalids = []
       if (@states.length == 0)
         raise "You must add some states to your Finite Automata before checking strings"
       end
 
-      puts """Evaluating strings for #{@description} using language #{@language.characters}".colorize(:yellow)
+      output << "Evaluating strings for #{@description} using language #{@language.characters}".colorize(:yellow)
       @strings.each do |string|
-        valid = evaluate_string(string)
-        if (!valid)
+        result = evaluate_string(string)
+        if (!result[:valid])
           @invalids << string
         end
+        output << result[:output]
       end
 
       num_invalid = @invalids.length
-      if (num_invalid > 0)
-        puts "State diagram may be incorrect for #{@description}".colorize(:red)
-        puts "\nA total of #{num_invalid} string#{'s' if num_invalid != 1} did not meet your expectations:\n"
+      valid = num_invalid == 0
+      if (!valid)
+        output << "\nState diagram may be incorrect for #{@description}".colorize(:red)
+        output << "\n\nA total of #{num_invalid} string#{'s' if num_invalid != 1} did not meet your expectations:\n"
 
         @invalids.each do |string|
           expected_string = string.expected ? "valid".colorize(:green) : "invalid".colorize(:red)
-          puts "* You expected the string '#{string.colorize(:blue)}' to be #{expected_string}"
+          output << "\n* You expected the string '#{string.colorize(:blue)}' to be #{expected_string}"
         end
-        puts "\nIf these expectations are correct, then your state diagram needs revising. Otherwise, you've simply expected the wrong values."
+        output << "\n\nIf these expectations are correct, then your state diagram needs revising. Otherwise, you've simply expected the wrong values."
       else
-        puts "State diagram is correct.".colorize(:green)
+        output << "\nState diagram is correct.\n".colorize(:green)
       end
-      puts
+
+      if (!suppress_output)
+        puts output
+      end
+      return valid
+    end
+
+    def generate_strings(number, length)
+      if valid_block.nil?
+        raise 'You must set the valid block for the Finite Automata to generate strings'
+      end
+
+      strings = []
+      number.times do
+        string = ""
+        length.times { string << @language.characters.sample }
+        strings << String.new(string, valid_block.call(string))
+      end
+      add_strings(strings)
+      strings
     end
 
     def to_s
@@ -165,30 +198,21 @@ module Fae
       return i_fa
     end
 
-    def add_state(new_state)
-      valid = true
-      @states.each do |state|
-        if (new_state.name == state.name)
-          raise 'Duplicate state added for Finite Automata'
-        end
-      end
-      @states << new_state
-    end
-
     def evaluate_string(string)
-      print "#{string.colorize(:blue)}: "
+      output = "\n#{string.colorize(:blue)}: "
       if (@language.string_is_valid(string))
         result = @states.first.evaluate(string, self)
+        output << result[:output]
         if (result[:accepting] != string.expected)
-          puts "\u2717".encode("utf-8").colorize(:red)
-          return false
+          output << "\u2717".encode("utf-8").colorize(:red)
+          return { :valid => false, :output => output }
         else
-          puts "\u2713".encode("utf-8").colorize(:green)
-          return true
+          output << "\u2713".encode("utf-8").colorize(:green)
+          return { :valid => true, :output => output }
         end
       else
-        puts "not valid for language #{@characters}".colorize(:red)
-        return true
+        output << "not valid for language #{@characters}".colorize(:red)
+        return { :valid => true, :output => output }
       end
     end
   end
