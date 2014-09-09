@@ -17,4 +17,8 @@ module Fae
   # Raised when trying to evaluate a FiniteAutomata
   # with no states.
   class EmptyStatesException < FaeException; end
+
+  # Raised when trying to perform a set operation on
+  # FiniteAutomata with two different languages.
+  class LanguageMismatchException < FaeException; end
 end

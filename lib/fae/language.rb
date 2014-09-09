@@ -17,12 +17,7 @@ module Fae
     # @param string [String] the string to check
     def string_is_valid(string)
       # Use lookahead to check for valid string
-      regex = "^(?=.*\\D)[#{@characters.join('|')}]+$"
-
-      if string.match /#{regex}/
-        return true
-      end
-      return false
+      string.match "^(?=.*\\D)[#{@characters.join('|')}]+$"
     end
 
     # Adds a character to the language.
