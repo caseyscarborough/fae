@@ -2,7 +2,9 @@
 
 [![Gem Version](https://badge.fury.io/rb/fae.svg)](http://badge.fury.io/rb/fae)
 
-This is a small Ruby gem that evaluates a Finite Automata State Diagram for validity.
+This is a small Ruby gem that evaluates a Finite Automata State Diagram for validity, and can generate Finite Automata from set operations of two or more different Finite Automata.
+
+The gem currently only handles Deterministic Finite Automata.
 
 ## Dependencies
 
@@ -16,7 +18,7 @@ Install the gem by running the following command:
 gem install fae
 ```
 
-## Usage
+## Evaluation Usage
 
 The gem comes with an executable, `fae`, and can be run in two different modes, interactive or file.
 
@@ -137,6 +139,43 @@ If your state diagram is incorrect, the program will give you feedback about you
 ![](https://raw.githubusercontent.com/caseyscarborough/fae/master/etc/example_failed_output.png)
 
 This can help you figure out where your diagram is going wrong.
+
+## Generation Usage
+
+You can use the gem to generate the union, intersection, or difference of two state diagrams. See the following:
+
+```ruby
+fa_1 = Fae::FiniteAutomata.new(LANGUAGE, "the language of all strings where the number of a's is odd")
+fa_2 = Fae::FiniteAutomata.new(LANGUAGE, "the language of all strings that include the substring 'bb'")
+
+# These states were determined by drawing the state diagram.
+fa_1.add_states([
+  Fae::State.new('A', { :a => 'B', :b => 'A' }, false),
+  Fae::State.new('B', { :a => 'A', :b => 'B' }, true),
+])
+
+# These states were determined by drawing the state diagram.
+fa_2.add_states([
+  Fae::State.new('C', { :a => 'C', :b => 'D' }, false),
+  Fae::State.new('D', { :a => 'C', :b => 'E' }, false),
+  Fae::State.new('E', { :a => 'E', :b => 'E' }, true),
+])
+
+# Get the intersection, union, and difference of the two finite automata
+intersection = fa_1.intersection(fa_2)
+union        = fa_1.union(fa_2)
+difference   = fa_1.difference(fa_2)
+```
+
+You can then output the new finite automata to see the states, paths, and accepting states:
+
+```ruby
+puts intersection
+```
+
+![Example Intersection Output](https://raw.githubusercontent.com/caseyscarborough/fae/master/etc/example_intersection_output.png)
+
+See [`intersection_union_difference.rb`](https://github.com/caseyscarborough/fae/blob/master/examples/intersection_union_difference.rb) for an example of generating the diagram and evaluating them.
 
 ## Examples
 
