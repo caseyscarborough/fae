@@ -138,6 +138,20 @@ valid = fa.evaluate!(true)
 puts "Diagram is correct" if valid
 ```
 
+The add and evaluate methods can be chained also:
+
+```ruby
+states = [
+  # Some states...
+]
+
+strings = [
+  # Some strings...
+]
+
+fa.add_states(states).add_strings(strings).evaluate!
+```
+
 ### Generating Tests for your State Diagram
 
 If you really want to test your diagram and don't want to have to come up with all of your valid or invalid strings, you can generate valid and invalid strings by setting the `valid_block` as a lambda returning a boolean expression on your Finite Automata that represents a valid string in the language.
@@ -164,6 +178,12 @@ fa.valid_block = lambda { |string| string.gsub('b', '').length % 2 == 1 }
 # Generate 1000 strings of length 20 and evaluate:
 fa.generate_strings(1000, 20)
 fa.evaluate!
+```
+
+These can be chained also:
+
+```ruby
+fa.generate_strings(1000, 20).evaluate!
 ```
 
 For more examples, see [`examples/advanced.rb`](https://github.com/caseyscarborough/fae/blob/master/examples/advanced.rb)
