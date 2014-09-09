@@ -27,6 +27,13 @@ module Fae
       end
     end
 
+    # Adds a single string to the strings array.
+    #
+    # @param string [String] the string to add
+    def add_string(string)
+      @strings << string
+    end
+    
     # Adds strings to check against when evaluating.
     #
     # @param states [Array] an array of states
